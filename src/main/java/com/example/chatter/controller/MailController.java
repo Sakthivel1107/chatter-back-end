@@ -19,7 +19,6 @@ public class MailController {
             emailService.sendEmail(contactRequest);
             return ResponseEntity.ok("Message sent successfully");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Message Sending failed");
         }
     }

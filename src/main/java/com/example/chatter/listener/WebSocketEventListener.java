@@ -31,10 +31,7 @@ public class WebSocketEventListener {
                 StompHeaderAccessor.wrap(
                         event.getMessage());
 
-        String id =
-                accessor.getFirstNativeHeader("id");
-
-        System.out.println("CONNECTED ID = " + id);
+        String id = accessor.getFirstNativeHeader("id");
 
         if (id == null) {
             return;
@@ -67,8 +64,6 @@ public class WebSocketEventListener {
                         true
                 )
         );
-
-//        System.out.println(id + " connected");
     }
 
     @EventListener
@@ -133,7 +128,5 @@ public class WebSocketEventListener {
                         false
                 )
         );
-
-        System.out.println(id + " disconnected");
     }
 }

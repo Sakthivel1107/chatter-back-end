@@ -49,7 +49,6 @@ public class MessageRepository {
         );
 
         Query query = new Query(criteria);
-        System.out.println(user1 +" "+user2);
         query.with(Sort.by(Sort.Direction.ASC, "timestamp"));
         return mongoTemplate.find(query,MessageEntity.class);
     }
@@ -72,8 +71,6 @@ public class MessageRepository {
     }
 
     public void updateMessagesStatus(String senderId,String receiverId){
-        System.out.println("senderId: " +senderId);
-        System.out.println("ReceiverId: "+receiverId);
         Query query = new Query();
         Criteria criteria = new Criteria().andOperator(
                 Criteria.where("senderId").is(senderId),

@@ -62,11 +62,8 @@ public class AuthController {
     @CrossOrigin("*")
     public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequest request){
         try{
-            System.out.println(request.getIdToken());
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance()).setAudience(Collections.singletonList(clientId)).build();
-            System.out.println("Client ID: " + clientId);
             GoogleIdToken googleIdToken = verifier.verify(request.getIdToken());
-            System.out.println("Verified token: " + googleIdToken);
 
             if(googleIdToken == null){
                 return ResponseEntity.badRequest().body("Invlaid Google token");

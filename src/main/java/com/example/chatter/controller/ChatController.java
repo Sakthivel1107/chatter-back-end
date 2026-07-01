@@ -67,7 +67,6 @@ public class ChatController {
 
         entity = messageService.createMessage(entity);
         if(!receiver.getContacts().contains(senderId)){
-            System.out.println("LOAD");
             receiver.getContacts().add(senderId);
             userRepository.save(receiver);
             ContactData contactData = userService.getContact(receiverId,senderId);
@@ -80,7 +79,7 @@ public class ChatController {
             );
             messagingTemplate.convertAndSend(
                     "/queue/" + senderId,
-                    new SocketResponse("CREATED",entity)
+                    new SocketResponse("CREATED",null)
             );
             return;
         }
@@ -109,7 +108,6 @@ public class ChatController {
         UserEntity receiver = userRepository.findById(ids.getSenderId());
         if(!receiver.getBlockedContacts().isEmpty() && receiver.getBlockedContacts().contains(ids.getReceiverId()))
             return;
-        System.out.println("off");
         messagingTemplate.convertAndSend("/queue/"+ids.getSenderId(),new SocketResponse("UNSEEN",ids.getReceiverId()));
     }
     @MessageMapping("/update")
@@ -159,7 +157,6 @@ public class ChatController {
     @MessageMapping("/deleteForEveryone")
     public void deleteForEveryone(String id){
         MessageEntity entity = messageService.findById(id);
-        System.out.println(entity.toString());
         entity.setSenderMsg("");
         messageService.createMessage(entity);
         if(entity.getReceiverMsg()!=null){
@@ -173,7 +170,6 @@ public class ChatController {
     @MessageMapping("/deleteForMeFromSender")
     public void deleteForMeFromSender(String id){
         MessageEntity entity = messageService.findById(id);
-        System.out.println(entity.toString());
         entity.setSenderMsg("");
         if(entity.getReceiverMsg() == null || entity.getReceiverMsg().isEmpty())
         {

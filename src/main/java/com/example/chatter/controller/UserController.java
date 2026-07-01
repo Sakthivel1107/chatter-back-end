@@ -114,7 +114,6 @@ public class UserController {
         try{
             return ResponseEntity.ok(userService.addContact(contact.get("uid")));
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while adding contact");
         }
     }
