@@ -55,7 +55,7 @@ public class ChatController {
                 .seen(message.getSeen())
                 .edited(false)
                 .build();
-        if( !receiver.getBlockedContacts().isEmpty() && receiver.getBlockedContacts().contains(senderId)){
+        if( (!receiver.getBlockedContacts().isEmpty()) && receiver.getBlockedContacts().contains(senderId)){
             entity.setReceiverMsg(null);
             messageService.createMessage(entity);
             messagingTemplate.convertAndSend(
@@ -71,7 +71,6 @@ public class ChatController {
             userRepository.save(receiver);
             ContactData contactData = userService.getContact(receiverId,senderId);
             List<MessageEntity> messages = contactData.getMessages();
-            messages.add(entity);
             contactData.setMessages(messages);
             messagingTemplate.convertAndSend(
                     "/queue/" + receiverId,
