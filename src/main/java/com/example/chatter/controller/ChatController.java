@@ -78,7 +78,7 @@ public class ChatController {
             );
             messagingTemplate.convertAndSend(
                     "/queue/" + senderId,
-                    new SocketResponse("CREATED",null)
+                    new SocketResponse("CREATED",entity)
             );
             return;
         }
