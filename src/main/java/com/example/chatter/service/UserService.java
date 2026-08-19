@@ -27,4 +27,5 @@ public interface UserService {
     ContactData convertToContactData(UserEntity userEntity);
     void removeContact(String contactId);
     List<ContactData> getBlockedContactsData();
+    UserEntity createGoogleUser(String email,String name);
 }

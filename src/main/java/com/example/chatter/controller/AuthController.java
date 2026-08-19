@@ -58,40 +58,87 @@ public class AuthController {
         return ResponseEntity.ok("Token is valid");
     }
 
-    @PostMapping("/google-login")
+    @PostMapping("/auth/google")
     @CrossOrigin("*")
-    public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequest request){
-        try{
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance()).setAudience(Collections.singletonList(clientId)).build();
-            GoogleIdToken googleIdToken = verifier.verify(request.getIdToken());
+    public ResponseEntity<?> googleLogin(
+            @RequestBody GoogleLoginRequest request) {
 
-            if(googleIdToken == null){
-                return ResponseEntity.badRequest().body("Invlaid Google token");
+        try {
+
+            // 1. Verify Google ID token
+            GoogleIdTokenVerifier verifier =
+                    new GoogleIdTokenVerifier.Builder(
+                            new NetHttpTransport(),
+                            GsonFactory.getDefaultInstance()
+                    )
+                            .setAudience(
+                                    Collections.singletonList(clientId)
+                            )
+                            .build();
+
+            GoogleIdToken googleIdToken =
+                    verifier.verify(request.getIdToken());
+
+            if (googleIdToken == null) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(Map.of(
+                                "message", "Invalid Google ID token"
+                        ));
             }
-            GoogleIdToken.Payload payload = googleIdToken.getPayload();
+
+            // 2. Get Google user information
+            GoogleIdToken.Payload payload =
+                    googleIdToken.getPayload();
+
             String email = payload.getEmail();
-            String name = (String)payload.get("name");
-            Optional<UserEntity> optionalUser = userRepository.findByEmail(email);
+            String name = (String) payload.get("name");
+
+            // 3. Find existing Chatter user
+            Optional<UserEntity> optionalUser =
+                    userRepository.findByEmail(email);
+
             UserEntity user;
-            if(optionalUser.isPresent()){
-             user = optionalUser.get();
-            }else {
-                user = new UserEntity();
-                user.setEmail(email);
-                user.setName(name);
-                user.setPassword(null);
-                user.setProvider("GOOGLE");
-                userRepository.save(user);
+
+            if (optionalUser.isPresent()) {
+
+                user = optionalUser.get();
+
+            } else {
+
+                // 4. Create new Google user
+                user = userService.createGoogleUser(
+                        email,
+                        name
+                );
             }
-            final UserDetails userDetails = appUserDetailsService.loadUserByUsername(user.getEmail());
-            final String jwtToken = jwtUtil.generateToken(userDetails);
-            return ResponseEntity.ok(Map.of(
-                    "email",email,
-                    "token",jwtToken
-            ));
-        }
-        catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException(e);
+
+            // 5. Load Spring Security user
+            UserDetails userDetails =
+                    appUserDetailsService
+                            .loadUserByUsername(user.getEmail());
+
+            // 6. Generate your Chatter JWT
+            String jwtToken =
+                    jwtUtil.generateToken(userDetails);
+
+            // 7. Send JWT to React
+            return ResponseEntity.ok(
+                    Map.of(
+                            "email", user.getEmail(),
+                            "name", user.getName(),
+                            "token", jwtToken
+                    )
+            );
+
+        } catch (GeneralSecurityException | IOException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of(
+                            "message",
+                            "Google authentication failed"
+                    ));
         }
     }
 

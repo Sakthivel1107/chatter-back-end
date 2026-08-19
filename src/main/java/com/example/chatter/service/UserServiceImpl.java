@@ -233,6 +233,27 @@ public class UserServiceImpl implements UserService{
         return blockedContactsData;
     }
 
+    @Override
+    public UserEntity createGoogleUser(String email, String name) {
+
+        UserEntity user = UserEntity.builder()
+                .uid(generateUid())
+                .email(email)
+                .name(name)
+                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                .url("https://raw.githubusercontent.com/Sakthivel1107/image-storage/main/images/defaultImage.png")
+                .provider("GOOGLE")
+                .language("")
+                .code("")
+                .online(false)
+                .lastSeen(0)
+                .contacts(new ArrayList<>())
+                .blockedContacts(new ArrayList<>())
+                .build();
+
+        return userRepository.save(user);
+    }
+
 
     @Override
     public String addContact(String uid) {

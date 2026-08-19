@@ -34,7 +34,7 @@ public class SecurityConfig {
         https
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/register","/api/login","/api/validateToken","/api/google-login","/api/translate","/ws/**","/ws").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/register","/api/login","/api/validateToken","/api/auth/google","/api/translate","/ws/**","/ws").permitAll().anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return https.build();
